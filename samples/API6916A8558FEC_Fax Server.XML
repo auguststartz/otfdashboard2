@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- This is a sample GenText Template that creates an XML file -->
+
+<!-- GenText templates are nothing more than simple text files with embedded macros.     -->
+
+<!-- Macros take the form of {FieldName} where FieldName corresponds to the attributes   -->
+<!-- in the job files.                                                                   -->
+
+<ImportSession>
+   <Batches>
+      <Batch BatchClassName="API" Processed="0">
+         <Documents>
+            <Document FormTypeName="Fax DocumentRecieved">  
+               <IndexFields>
+                  <IndexField Name="User ID" Value="API" />
+                  <IndexField Name="Group ID" Value="HILLS" />  
+                  <IndexField Name="UniqueID" Value="API6916A8558FEC" />
+                  <IndexField Name="Fax Handle" Value="00117248" />
+                  <IndexField Name="New Fax Handle" Value="" />
+                  <IndexField Name="Fax Channel" Value="4" /> 
+                  <IndexField Name="Job Create Time" Value="11/14/2025 3:56:57 AM" />
+                  <IndexField Name="Fax Create Time" Value="11/14/2025 3:55:44 AM" />
+                  <IndexField Name="Fax Completion Time" Value="11/14/2025 3:56:57 AM" /> 
+                  <IndexField Name="Fax Server" Value="RF24DOT4" />  
+                  <IndexField Name="Type" Value="SENDJob" />  
+                  <IndexField Name="DID Number" Value="5203194131" /> 
+                  <IndexField Name="Send Duration" Value="00:00:37" /> 
+                  
+                  <IndexField Name="To Fax Number" Value="5435435555" /> 
+                  <IndexField Name="To Voice Number" Value="" /> 
+                  <IndexField Name="To Name" Value="234234234" /> 
+                  <IndexField Name="To Company" Value="" /> 
+                  <IndexField Name="To Location" Value="" /> 
+				                    
+                  <IndexField Name="From Fax Number" Value="5435435555" /> 
+                  <IndexField Name="From Voice Number" Value="" /> 
+                  <IndexField Name="From Name" Value="" /> 
+                  <IndexField Name="From Company Voice Number" Value="" /> 
+                  <IndexField Name="From Company Fax Number" Value="" /> 
+                  <IndexField Name="BillingInfo 1" Value="" /> 
+                  <IndexField Name="BillingInfo 2" Value="" /> 
+                  <IndexField Name="Comments" Value="" /> 
+                  <IndexField Name="DelegateID" Value="API" /> 
+				  
+                  <IndexField Name="GenericFlag1" Value="False" />               
+                  
+                  <IndexField Name="Board Type" Value="3" /> 
+                  <IndexField Name="Board Type String" Value="New Brooktrout" /> 
+                  <IndexField Name="Remote ID" Value="Fax Server" /> 
+                  <IndexField Name="Elapsed Time" Value="00:00:37" />
+                  <IndexField Name="Bad Page Count" Value="0" />
+                  <IndexField Name="Good Page Count" Value="2" />
+                  <IndexField Name="Channel Used" Value="4" />
+                  <IndexField Name="Disposition" Value="0" />
+                  <IndexField Name="TermStat" Value="32" />
+                  <IndexField Name="Remote Server" Value="RF24DOT4" />
+                  
+                  <IndexField Name="ANI is valid" Value="False" />
+                  <IndexField Name="ANI data" Value="" />
+                  <IndexField Name="AOC is valid" Value="False" />
+                  <IndexField Name="AOC data 0" Value="0" />
+                  <IndexField Name="AOC data 1" Value="0" />
+                  <IndexField Name="AOC data 2" Value="0" />
+                  
+                  <IndexField Name="ISDN Cause is Valid" Value="False" />
+                  <IndexField Name="ISDN Cause Value" Value="0" />
+                  <IndexField Name="Brooktrout Call Status" Value="0" />
+                  <IndexField Name="Brooktrout Call Line Status" Value="339" />
+                  <IndexField Name="Brooktrout Fax Status" Value="0" />
+                  <IndexField Name="Brooktrout Fax Line Status" Value="0" />
+                  
+                  <IndexField Name="Gamma Error" Value="0" />
+
+                  <IndexField Name="RFConnect JobID" Value="" />
+                  <IndexField Name="TransferDelegateID" Value="API" /> 
+               </IndexFields>
+               <Pages>
+                  <Page ImportFileName="API6916A8558FEC_Fax Server.tif" />
+                  <Page HistoryFilename="API6916A8558FEC_Fax Server_History.TXT" />
+               </Pages>
+            </Document>
+         </Documents>
+      </Batch>
+   </Batches>
+</ImportSession>

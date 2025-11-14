@@ -1,0 +1,33 @@
+11/14/2025 3:55 AM Origin
+ Created by API
+
+ 11/14/2025 3:56 AM Conversion
+	[Output.csv]
+	Type: text/utf8
+	G3 to TIFF #1: Success [image/g3] (387ms)
+	INSO #1: Success [image/tiff] (553ms)
+	Word Automation #1: Microsoft Word is not installed on this server. (21ms)
+	(RF24DOT4:WORKSRV2)
+
+ 11/14/2025 3:56 AM Conversion
+	Successfully created cover sheet.
+	Type: application/postscript
+	G3 to TIFF #1: Success [image/g3] (2ms)
+	GhostScript TIFF #1: Success [image/tiff] (77ms)
+	(RF24DOT4:WORKSRV3)
+
+ 11/14/2025 3:56 AM Transmission
+	Sent to: 234234234
+	Phone: 5435435555@127.0.0.1
+	Billing information: '', ''
+	Remote ID: Fax Server
+	Unique ID: "API6916A8558FEC"
+	Elapsed time: 0 minutes, 37 seconds.
+	Used channel 4 on server "RF24DOT4".
+	No ANI data.
+	No AOC data.
+	ECM
+	Resulting status code (0/339; 0/0): Success
+	Pages sent: 1 - 2
+	Sent by: "API"
+
