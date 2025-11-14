@@ -1,0 +1,62 @@
+{
+  "dashboard": {
+    "title": "RightFax Performance Monitoring",
+    "tags": ["rightfax", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Jobs Per Minute",
+        "type": "graph",
+        "targets": [
+          {
+            "rawSql": "SELECT\n  date_trunc('minute', completed_at) as time,\n  COUNT(*) as \"Jobs\"\nFROM fax_completions\nWHERE completed_at >= NOW() - INTERVAL '24 hours'\nGROUP BY 1\nORDER BY 1",
+            "format": "time_series"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Success Rate",
+        "type": "gauge",
+        "targets": [
+          {
+            "rawSql": "SELECT\n  ROUND((SUM(CASE WHEN success = true THEN 1 ELSE 0 END)::numeric / COUNT(*)) * 100, 2) as \"Success Rate %\"\nFROM fax_completions\nWHERE completed_at >= NOW() - INTERVAL '24 hours'",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Average Call Duration",
+        "type": "graph",
+        "targets": [
+          {
+            "rawSql": "SELECT\n  date_trunc('minute', completed_at) as time,\n  AVG(duration_seconds) as \"Avg Duration (s)\"\nFROM fax_completions\nWHERE completed_at >= NOW() - INTERVAL '24 hours' AND success = true\nGROUP BY 1\nORDER BY 1",
+            "format": "time_series"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Total Completions (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "rawSql": "SELECT COUNT(*) as \"Total\" FROM fax_completions WHERE completed_at >= NOW() - INTERVAL '24 hours'",
+            "format": "table"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      }
+    ],
+    "refresh": "5s",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    }
+  }
+}

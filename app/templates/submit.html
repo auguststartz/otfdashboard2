@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Batch - RightFax Testing Platform{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>New Fax Batch Submission</h2>
+    <form id="batch-form">
+        <div style="margin-bottom: 1rem;">
+            <label>Batch Name:</label><br>
+            <input type="text" name="batch_name" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;" placeholder="e.g., Load Test 2025-11-14">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Number of Faxes:</label><br>
+            <input type="number" name="total_count" required min="1" max="100000" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;" value="10">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Timing:</label><br>
+            <input type="radio" name="timing_type" value="immediate" checked> Send Immediately<br>
+            <input type="radio" name="timing_type" value="interval"> Send with Interval:
+            <input type="number" name="interval_seconds" min="1" max="300" value="5" style="width: 80px; padding: 0.5rem;"> seconds
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Recipient Phone:</label><br>
+            <input type="text" name="recipient_phone" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;" placeholder="e.g., 555-1234">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Recipient Name:</label><br>
+            <input type="text" name="recipient_name" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;" placeholder="e.g., Test User">
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Account:</label><br>
+            <select name="account_name" id="account-select" required style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                <option value="">Loading accounts...</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Submission Method:</label><br>
+            <input type="radio" name="submission_method" value="FCL" checked> FCL (File Drop)<br>
+            <input type="radio" name="submission_method" value="API"> REST API
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+            <label>Notes:</label><br>
+            <textarea name="notes" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;" rows="3"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success">Submit Batch</button>
+    </form>
+</div>
+
+<div id="result-message" style="display: none;" class="card">
+    <h3 id="result-title"></h3>
+    <p id="result-text"></p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Load accounts
+    $.get('/api/accounts', function(data) {
+        let options = '<option value="">Select an account</option>';
+        if (data.accounts && data.accounts.length > 0) {
+            data.accounts.forEach(function(account) {
+                options += '<option value="' + account.account_name + '">' + account.account_name + '</option>';
+            });
+        }
+        $('#account-select').html(options);
+    });
+
+    // Handle form submission
+    $('#batch-form').submit(function(e) {
+        e.preventDefault();
+
+        let formData = {
+            batch_name: $('input[name=batch_name]').val(),
+            total_count: parseInt($('input[name=total_count]').val()),
+            timing_type: $('input[name=timing_type]:checked').val(),
+            recipient_phone: $('input[name=recipient_phone]').val(),
+            recipient_name: $('input[name=recipient_name]').val(),
+            account_name: $('select[name=account_name]').val(),
+            submission_method: $('input[name=submission_method]:checked').val(),
+            notes: $('textarea[name=notes]').val(),
+            created_by: 'web_ui'
+        };
+
+        // Add interval if selected
+        if (formData.timing_type === 'interval') {
+            formData.interval_seconds = parseInt($('input[name=interval_seconds]').val());
+        }
+
+        // Submit to API
+        $.ajax({
+            url: '/api/batches',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                $('#result-title').text('Success!');
+                $('#result-text').text('Batch created successfully. Batch ID: ' + response.batch.id);
+                $('#result-message').show();
+
+                // Redirect after 2 seconds
+                setTimeout(function() {
+                    window.location.href = '/batches';
+                }, 2000);
+            },
+            error: function(xhr) {
+                $('#result-title').text('Error');
+                $('#result-text').text('Failed to create batch: ' + (xhr.responseJSON?.error || 'Unknown error'));
+                $('#result-message').show();
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

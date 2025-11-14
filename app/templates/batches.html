@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Batches - RightFax Testing Platform{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Submission Batches</h2>
+    <div style="margin-bottom: 1rem;">
+        <button class="btn btn-danger" onclick="resetDatabase()">Reset Database (Delete All Data)</button>
+    </div>
+    <div id="batches-container">
+        <p>Loading batches...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function loadBatches() {
+    $.get('/api/batches?limit=100', function(data) {
+        if (data.batches && data.batches.length > 0) {
+            let html = '<table style="width:100%; border-collapse: collapse;">';
+            html += '<tr style="border-bottom: 2px solid #ddd;">';
+            html += '<th style="text-align:left; padding:0.5rem;">ID</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Batch Name</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Created</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Count</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Method</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Status</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Progress</th>';
+            html += '<th style="text-align:left; padding:0.5rem;">Actions</th>';
+            html += '</tr>';
+
+            data.batches.forEach(function(batch) {
+                html += '<tr style="border-bottom: 1px solid #eee;">';
+                html += '<td style="padding: 0.5rem;">' + batch.id + '</td>';
+                html += '<td style="padding: 0.5rem;">' + (batch.batch_name || 'Unnamed') + '</td>';
+                html += '<td style="padding: 0.5rem;">' + new Date(batch.created_at).toLocaleString() + '</td>';
+                html += '<td style="padding: 0.5rem;">' + batch.total_count + '</td>';
+                html += '<td style="padding: 0.5rem;">' + batch.submission_method + '</td>';
+                html += '<td style="padding: 0.5rem;"><span style="background:#eee; padding:0.25rem 0.5rem; border-radius:4px;">' + batch.status + '</span></td>';
+                html += '<td style="padding: 0.5rem;">' + (batch.submitted_count || 0) + ' / ' + batch.total_count + '</td>';
+                html += '<td style="padding: 0.5rem;"><button class="btn" style="padding:0.25rem 0.5rem; font-size:0.875rem;" onclick="deleteBatch(' + batch.id + ')">Delete</button></td>';
+                html += '</tr>';
+            });
+            html += '</table>';
+            $('#batches-container').html(html);
+        } else {
+            $('#batches-container').html('<p>No batches found. <a href="/submit">Create your first batch!</a></p>');
+        }
+    });
+}
+
+function deleteBatch(batchId) {
+    if (!confirm('Are you sure you want to delete this batch?')) {
+        return;
+    }
+
+    $.ajax({
+        url: '/api/batches/' + batchId,
+        method: 'DELETE',
+        success: function() {
+            alert('Batch deleted successfully');
+            loadBatches();
+        },
+        error: function(xhr) {
+            alert('Error deleting batch: ' + (xhr.responseJSON?.error || 'Unknown error'));
+        }
+    });
+}
+
+function resetDatabase() {
+    if (!confirm('WARNING: This will delete ALL data from the database. This cannot be undone. Are you sure?')) {
+        return;
+    }
+
+    if (prompt('Type DELETE_ALL_DATA to confirm:') !== 'DELETE_ALL_DATA') {
+        alert('Confirmation failed. Database not reset.');
+        return;
+    }
+
+    $.ajax({
+        url: '/api/database/reset',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ confirm: 'DELETE_ALL_DATA' }),
+        success: function() {
+            alert('Database reset successfully. All data has been deleted.');
+            loadBatches();
+        },
+        error: function(xhr) {
+            alert('Error resetting database: ' + (xhr.responseJSON?.error || 'Unknown error'));
+        }
+    });
+}
+
+$(document).ready(function() {
+    loadBatches();
+    // Reload every 5 seconds
+    setInterval(loadBatches, 5000);
+});
+</script>
+{% endblock %}
