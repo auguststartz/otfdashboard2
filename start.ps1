@@ -1,10 +1,15 @@
 # RightFax Testing & Monitoring Platform - Windows Startup Script
 # PowerShell Script for Docker Desktop on Windows
 
+# Change to the script's directory
+Set-Location -Path $PSScriptRoot
+
 Write-Host "===============================================" -ForegroundColor Cyan
 Write-Host "RightFax Testing & Monitoring Platform" -ForegroundColor Cyan
 Write-Host "Windows Docker Desktop Edition" -ForegroundColor Cyan
 Write-Host "===============================================" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Working directory: $PSScriptRoot" -ForegroundColor Gray
 Write-Host ""
 
 # Check if Docker is installed and running
@@ -45,12 +50,19 @@ try {
 
 # Check if .env file exists
 Write-Host "Checking configuration..." -ForegroundColor Yellow
-if (-not (Test-Path ".env")) {
+
+# Debug: List files in current directory
+$envExists = Test-Path ".env"
+$exampleExists = Test-Path ".env.example"
+Write-Host "  .env file exists: $envExists" -ForegroundColor Gray
+Write-Host "  .env.example file exists: $exampleExists" -ForegroundColor Gray
+
+if (-not $envExists) {
     Write-Host "[WARNING] .env file not found" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Creating .env file from .env.example..." -ForegroundColor Yellow
 
-    if (Test-Path ".env.example") {
+    if ($exampleExists) {
         Copy-Item ".env.example" ".env"
         Write-Host "[OK] .env file created" -ForegroundColor Green
         Write-Host ""
