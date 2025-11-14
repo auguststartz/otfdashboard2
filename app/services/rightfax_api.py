@@ -16,7 +16,7 @@ class RightFaxAPIClient:
     Client for RightFax REST API
     """
 
-    def __init__(self, api_url=None, username=None, password=None):
+    def __init__(self, api_url=None, username=None, password=None, ssl_verify=None):
         """
         Initialize API client
 
@@ -24,10 +24,12 @@ class RightFaxAPIClient:
             api_url: RightFax API base URL (defaults to config)
             username: RightFax API username (defaults to config)
             password: RightFax API password (defaults to config)
+            ssl_verify: Whether to verify SSL certificates (defaults to config)
         """
         self.api_url = (api_url or Config.RIGHTFAX_API_URL).rstrip('/')
         self.username = username or Config.RIGHTFAX_USERNAME
         self.password = password or Config.RIGHTFAX_PASSWORD
+        self.ssl_verify = ssl_verify if ssl_verify is not None else Config.RIGHTFAX_SSL_VERIFY
         self.session = requests.Session()
         self.session.headers.update({
             'Content-Type': 'application/json',
@@ -37,6 +39,12 @@ class RightFaxAPIClient:
         # Set up Basic Authentication if credentials provided
         if self.username and self.password:
             self.session.auth = (self.username, self.password)
+
+        # Disable SSL warnings if verification is disabled
+        if not self.ssl_verify:
+            import urllib3
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            logger.warning("SSL certificate verification is DISABLED - this should only be used in development/testing")
 
         if not self.api_url:
             logger.warning("RightFax API URL not configured")
@@ -124,7 +132,8 @@ class RightFaxAPIClient:
             response = self.session.post(
                 endpoint,
                 json=payload,
-                timeout=30
+                timeout=30,
+                verify=self.ssl_verify
             )
 
             # Check response
@@ -170,7 +179,7 @@ class RightFaxAPIClient:
             endpoint = f"{self.api_url}/faxes/{job_id}"
 
             # Session already has auth configured in __init__
-            response = self.session.get(endpoint, timeout=10)
+            response = self.session.get(endpoint, timeout=10, verify=self.ssl_verify)
 
             if response.status_code == 200:
                 return response.json()
@@ -215,7 +224,7 @@ class RightFaxAPIClient:
             endpoint = f"{self.api_url}/health"
 
             # Session already has auth configured in __init__
-            response = self.session.get(endpoint, timeout=5)
+            response = self.session.get(endpoint, timeout=5, verify=self.ssl_verify)
             return response.status_code in [200, 401]  # 401 means auth issue but API is reachable
 
         except Exception as e:
