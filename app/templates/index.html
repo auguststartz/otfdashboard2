@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - RightFax Testing Platform{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Welcome to RightFax Testing & Monitoring Platform</h2>
+    <p>Load testing and performance monitoring for RightFax server infrastructure.</p>
+</div>
+
+<div id="stats-container" class="stats-grid">
+    <div class="stat-card">
+        <h3 id="total-batches">-</h3>
+        <p>Total Batches</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="total-submissions">-</h3>
+        <p>Total Submissions</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="total-completions">-</h3>
+        <p>Total Completions</p>
+    </div>
+    <div class="stat-card">
+        <h3 id="success-rate">-</h3>
+        <p>Success Rate</p>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Quick Actions</h2>
+    <a href="/submit"><button class="btn btn-success">Submit New Batch</button></a>
+    <a href="/batches"><button class="btn">View All Batches</button></a>
+    <a href="/grafana" target="_blank"><button class="btn">Open Grafana Dashboard</button></a>
+</div>
+
+<div class="card">
+    <h2>Recent Activity</h2>
+    <div id="recent-batches">
+        <p>Loading...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Load statistics
+    $.get('/api/stats', function(data) {
+        $('#total-batches').text(data.total_batches || 0);
+        $('#total-submissions').text(data.total_submissions || 0);
+        $('#total-completions').text(data.total_completions || 0);
+        $('#success-rate').text((data.success_rate || 0) + '%');
+    });
+
+    // Load recent batches
+    $.get('/api/batches?limit=5', function(data) {
+        if (data.batches && data.batches.length > 0) {
+            let html = '<table style="width:100%; border-collapse: collapse;">';
+            html += '<tr style="border-bottom: 2px solid #ddd;"><th>Batch Name</th><th>Created</th><th>Count</th><th>Method</th><th>Status</th></tr>';
+            data.batches.forEach(function(batch) {
+                html += '<tr style="border-bottom: 1px solid #eee;">';
+                html += '<td style="padding: 0.5rem;">' + (batch.batch_name || 'Unnamed') + '</td>';
+                html += '<td style="padding: 0.5rem;">' + new Date(batch.created_at).toLocaleString() + '</td>';
+                html += '<td style="padding: 0.5rem;">' + batch.total_count + '</td>';
+                html += '<td style="padding: 0.5rem;">' + batch.submission_method + '</td>';
+                html += '<td style="padding: 0.5rem;">' + batch.status + '</td>';
+                html += '</tr>';
+            });
+            html += '</table>';
+            $('#recent-batches').html(html);
+        } else {
+            $('#recent-batches').html('<p>No batches found. <a href="/submit">Create your first batch!</a></p>');
+        }
+    });
+});
+</script>
+{% endblock %}
