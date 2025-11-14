@@ -218,14 +218,14 @@ docker compose logs -f
 ### Accessing the Application
 
 Open your browser:
-- **Dashboard**: http://localhost
+- **Dashboard**: http://localhost:8081
 - **Grafana**: http://localhost:3000 (login: admin/admin)
-- **API**: http://localhost/api
-- **Health**: http://localhost/health
+- **API**: http://localhost:8081/api
+- **Health**: http://localhost:8081/health
 
 ### First Login
 
-1. Navigate to http://localhost
+1. Navigate to http://localhost:8081
 2. You should see the RightFax Testing Platform dashboard
 3. Click "Submit Batch" to create your first test
 4. Open http://localhost:3000 for Grafana monitoring
@@ -246,21 +246,20 @@ Open your browser:
 
 **Symptoms**: `Error: Ports are not available: port is already allocated`
 
-**Solution 1**: Stop IIS or other services using port 80
+**Solution 1**: Stop IIS or other services using port 8081
 ```powershell
-# Check what's using port 80
-netstat -ano | findstr :80
+# Check what's using port 8081
+netstat -ano | findstr :8081
 
-# Stop IIS (if applicable)
-iisreset /stop
+# Stop the conflicting service if needed
 ```
 
 **Solution 2**: Change the port in .env
 ```bash
 # In .env file
-NGINX_HTTP_PORT=8080
+NGINX_HTTP_PORT=9000
 ```
-Then access at: http://localhost:8080
+Then access at: http://localhost:9000
 
 ### Issue: Drive Not Shared
 
@@ -353,7 +352,7 @@ If RightFax is installed on your local machine:
 
 ```bash
 # In .env
-RIGHTFAX_API_URL=http://localhost:8080/api
+RIGHTFAX_API_URL=http://localhost/api
 RIGHTFAX_FCL_DIRECTORY=C:/Program Files/RightFax/FCL
 RIGHTFAX_XML_DIRECTORY=C:/Program Files/RightFax/XML
 ```
@@ -403,7 +402,7 @@ cmdkey /add:rightfax-server /user:DOMAIN\username /pass:password
 
 ```powershell
 # Test API connection
-curl http://localhost/health
+curl http://localhost:8081/health
 
 # Test FCL directory access
 docker compose exec web ls /mnt/rightfax/fcl
@@ -569,10 +568,10 @@ docker compose down -v
 
 ### Default URLs
 
-- Dashboard: http://localhost
+- Dashboard: http://localhost:8081
 - Grafana: http://localhost:3000
-- API: http://localhost/api
-- Health: http://localhost/health
+- API: http://localhost:8081/api
+- Health: http://localhost:8081/health
 
 ### Default Credentials
 
@@ -585,7 +584,7 @@ You should now have the RightFax Testing & Monitoring Platform running on Window
 
 1. Start Docker Desktop
 2. Run `docker compose up -d` or use `start.ps1`
-3. Access http://localhost in your browser
+3. Access http://localhost:8081 in your browser
 4. Submit test batches and monitor in Grafana
 
 For questions or issues, refer to the main README.md or check the logs with `docker compose logs`.

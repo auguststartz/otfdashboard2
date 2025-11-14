@@ -119,7 +119,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "[ERROR] Failed to start Docker services" -ForegroundColor Red
     Write-Host ""
     Write-Host "Troubleshooting tips:" -ForegroundColor Yellow
-    Write-Host "  1. Check that ports 80, 3000, 5000, 5432, 6379 are not in use" -ForegroundColor White
+    Write-Host "  1. Check that ports 8081, 3000, 5000, 5432, 6379 are not in use" -ForegroundColor White
     Write-Host "  2. Ensure Docker Desktop has file sharing permissions" -ForegroundColor White
     Write-Host "  3. Check Docker Desktop logs for errors" -ForegroundColor White
     Write-Host "  4. Try running: docker compose logs" -ForegroundColor White
@@ -143,10 +143,10 @@ Write-Host "Platform Started Successfully!" -ForegroundColor Green
 Write-Host "===============================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "Access the application at:" -ForegroundColor Cyan
-Write-Host "  - Web Interface:  http://localhost" -ForegroundColor White
+Write-Host "  - Web Interface:  http://localhost:8081" -ForegroundColor White
 Write-Host "  - Grafana:        http://localhost:3000 (admin/admin)" -ForegroundColor White
-Write-Host "  - API:            http://localhost/api" -ForegroundColor White
-Write-Host "  - Health Check:   http://localhost/health" -ForegroundColor White
+Write-Host "  - API:            http://localhost:8081/api" -ForegroundColor White
+Write-Host "  - Health Check:   http://localhost:8081/health" -ForegroundColor White
 Write-Host ""
 Write-Host "Useful commands:" -ForegroundColor Cyan
 Write-Host "  View logs:        docker compose logs -f" -ForegroundColor White
@@ -157,7 +157,7 @@ Write-Host ""
 # Optional: Open browser
 $response = Read-Host "Would you like to open the web interface in your browser? (Y/N)"
 if ($response -eq "Y" -or $response -eq "y") {
-    Start-Process "http://localhost"
+    Start-Process "http://localhost:8081"
 }
 
 Write-Host ""
