@@ -16,27 +16,33 @@ class RightFaxAPIClient:
     Client for RightFax REST API
     """
 
-    def __init__(self, api_url=None, api_key=None):
+    def __init__(self, api_url=None, username=None, password=None):
         """
         Initialize API client
 
         Args:
             api_url: RightFax API base URL (defaults to config)
-            api_key: API authentication key (defaults to config)
+            username: RightFax API username (defaults to config)
+            password: RightFax API password (defaults to config)
         """
         self.api_url = (api_url or Config.RIGHTFAX_API_URL).rstrip('/')
-        self.api_key = api_key or Config.RIGHTFAX_API_KEY
+        self.username = username or Config.RIGHTFAX_USERNAME
+        self.password = password or Config.RIGHTFAX_PASSWORD
         self.session = requests.Session()
         self.session.headers.update({
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         })
 
+        # Set up Basic Authentication if credentials provided
+        if self.username and self.password:
+            self.session.auth = (self.username, self.password)
+
         if not self.api_url:
             logger.warning("RightFax API URL not configured")
 
-        if not self.api_key:
-            logger.warning("RightFax API key not configured")
+        if not self.username or not self.password:
+            logger.warning("RightFax API credentials not configured")
 
     def submit_fax(self, recipient_phone: str, account_name: str,
                   attachment_path: Optional[str] = None,
@@ -111,18 +117,13 @@ class RightFaxAPIClient:
         try:
             endpoint = f"{self.api_url}/faxes"
 
-            # Add authentication
-            headers = {}
-            if self.api_key:
-                headers['Authorization'] = f"Bearer {self.api_key}"
-
             logger.info(f"Submitting fax to {recipient_phone} via API")
             logger.debug(f"API endpoint: {endpoint}")
 
+            # Session already has auth configured in __init__
             response = self.session.post(
                 endpoint,
                 json=payload,
-                headers=headers,
                 timeout=30
             )
 
@@ -168,11 +169,8 @@ class RightFaxAPIClient:
         try:
             endpoint = f"{self.api_url}/faxes/{job_id}"
 
-            headers = {}
-            if self.api_key:
-                headers['Authorization'] = f"Bearer {self.api_key}"
-
-            response = self.session.get(endpoint, headers=headers, timeout=10)
+            # Session already has auth configured in __init__
+            response = self.session.get(endpoint, timeout=10)
 
             if response.status_code == 200:
                 return response.json()
@@ -213,14 +211,11 @@ class RightFaxAPIClient:
             bool: True if connection successful
         """
         try:
-            # Try to ping API endpoint
+            # Try to ping API endpoint or just test the base URL
             endpoint = f"{self.api_url}/health"
 
-            headers = {}
-            if self.api_key:
-                headers['Authorization'] = f"Bearer {self.api_key}"
-
-            response = self.session.get(endpoint, headers=headers, timeout=5)
+            # Session already has auth configured in __init__
+            response = self.session.get(endpoint, timeout=5)
             return response.status_code in [200, 401]  # 401 means auth issue but API is reachable
 
         except Exception as e:

@@ -33,7 +33,8 @@ class Config:
 
     # RightFax Configuration
     RIGHTFAX_API_URL = os.getenv('RIGHTFAX_API_URL', '')
-    RIGHTFAX_API_KEY = os.getenv('RIGHTFAX_API_KEY', '')
+    RIGHTFAX_USERNAME = os.getenv('RIGHTFAX_USERNAME', '')
+    RIGHTFAX_PASSWORD = os.getenv('RIGHTFAX_PASSWORD', '')
     RIGHTFAX_FCL_DIRECTORY = os.getenv('RIGHTFAX_FCL_DIRECTORY', '/mnt/rightfax/fcl')
     RIGHTFAX_XML_DIRECTORY = os.getenv('RIGHTFAX_XML_DIRECTORY', '/mnt/rightfax/xml')
 

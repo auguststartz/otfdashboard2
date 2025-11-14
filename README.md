@@ -53,7 +53,8 @@ POSTGRES_PASSWORD=your_secure_password
 
 # RightFax configuration
 RIGHTFAX_API_URL=https://your-rightfax-server/api/v2
-RIGHTFAX_API_KEY=your_api_key
+RIGHTFAX_USERNAME=your_rightfax_username
+RIGHTFAX_PASSWORD=your_rightfax_password
 RIGHTFAX_FCL_DIRECTORY=/path/to/rightfax/fcl
 RIGHTFAX_XML_DIRECTORY=/path/to/rightfax/xml
 
@@ -155,7 +156,8 @@ otfdashboard2/
 | `POSTGRES_PASSWORD` | PostgreSQL password | changeme |
 | `POSTGRES_DB` | Database name | rightfax_testing |
 | `RIGHTFAX_API_URL` | RightFax REST API endpoint | - |
-| `RIGHTFAX_API_KEY` | API authentication key | - |
+| `RIGHTFAX_USERNAME` | RightFax API username | - |
+| `RIGHTFAX_PASSWORD` | RightFax API password | - |
 | `RIGHTFAX_FCL_DIRECTORY` | FCL file drop location | /mnt/rightfax/fcl |
 | `RIGHTFAX_XML_DIRECTORY` | XML output directory | /mnt/rightfax/xml |
 | `LOG_LEVEL` | Logging level | INFO |
