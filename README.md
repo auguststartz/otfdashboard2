@@ -72,9 +72,9 @@ docker compose up -d
 
 ### 4. Access the Application
 
-- **Web Interface**: http://localhost
+- **Web Interface**: http://localhost:8081
 - **Grafana Dashboard**: http://localhost:3000 (admin/admin or configured password)
-- **API**: http://localhost/api
+- **API**: http://localhost:8081/api
 
 ## Quick Start for Windows (Docker Desktop)
 
@@ -195,9 +195,9 @@ You should see 6 services running:
 #### 5. Access the Application
 
 Open your web browser:
-- **Main Dashboard**: http://localhost
+- **Main Dashboard**: http://localhost:8081
 - **Grafana**: http://localhost:3000 (login: admin/admin)
-- **API Health Check**: http://localhost/health
+- **API Health Check**: http://localhost:8081/health
 
 #### 6. View Logs (Optional)
 
@@ -223,15 +223,15 @@ docker compose logs -f xml_watcher
 - Wait for the green "Docker is running" indicator
 
 #### Issue: "Error response from daemon: Ports are not available"
-**Solution**: Port 80 or other ports already in use
+**Solution**: Port 8081 or other ports already in use
 ```powershell
-# Find what's using port 80
-netstat -ano | findstr :80
+# Find what's using port 8081
+netstat -ano | findstr :8081
 
-# Change ports in .env file if needed
-echo "NGINX_HTTP_PORT=8080" >> .env
+# Change ports in .env file if needed (e.g., to port 9000)
+echo "NGINX_HTTP_PORT=9000" >> .env
 
-# Then use: http://localhost:8080
+# Then use: http://localhost:9000
 ```
 
 #### Issue: "Drive has not been shared"
@@ -313,7 +313,7 @@ If you encounter issues:
 
 ### Submitting a Test Batch
 
-1. Navigate to http://localhost/submit
+1. Navigate to http://localhost:8081/submit
 2. Configure batch parameters:
    - **Batch Name**: Descriptive name for the test
    - **Number of Faxes**: How many faxes to send (1-100,000)
@@ -325,7 +325,7 @@ If you encounter issues:
 
 ### Monitoring Performance
 
-1. Access Grafana at http://localhost:3000
+1. Access Grafana at http://localhost:3000 (or http://localhost:8081/grafana)
 2. Navigate to "RightFax Performance Monitoring" dashboard
 3. View metrics:
    - Jobs per minute
@@ -336,7 +336,7 @@ If you encounter issues:
 
 ### Managing Batches
 
-- View all batches at http://localhost/batches
+- View all batches at http://localhost:8081/batches
 - Monitor active batch progress in real-time
 - Delete completed batches
 - Reset database (delete all data) if needed
