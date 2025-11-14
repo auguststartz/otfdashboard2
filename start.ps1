@@ -14,9 +14,9 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Docker not found"
     }
-    Write-Host "✓ Docker is installed: $dockerVersion" -ForegroundColor Green
+    Write-Host "[OK] Docker is installed: $dockerVersion" -ForegroundColor Green
 } catch {
-    Write-Host "✗ Error: Docker is not installed or not in PATH" -ForegroundColor Red
+    Write-Host "[ERROR] Docker is not installed or not in PATH" -ForegroundColor Red
     Write-Host ""
     Write-Host "Please install Docker Desktop for Windows:" -ForegroundColor Yellow
     Write-Host "https://www.docker.com/products/docker-desktop/" -ForegroundColor Yellow
@@ -32,9 +32,9 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Docker daemon not running"
     }
-    Write-Host "✓ Docker is running" -ForegroundColor Green
+    Write-Host "[OK] Docker is running" -ForegroundColor Green
 } catch {
-    Write-Host "✗ Error: Docker Desktop is not running" -ForegroundColor Red
+    Write-Host "[ERROR] Docker Desktop is not running" -ForegroundColor Red
     Write-Host ""
     Write-Host "Please start Docker Desktop from the Start Menu" -ForegroundColor Yellow
     Write-Host "Wait for the Docker Desktop icon to show 'Docker is running'" -ForegroundColor Yellow
@@ -46,13 +46,13 @@ try {
 # Check if .env file exists
 Write-Host "Checking configuration..." -ForegroundColor Yellow
 if (-not (Test-Path ".env")) {
-    Write-Host "⚠ Warning: .env file not found" -ForegroundColor Yellow
+    Write-Host "[WARNING] .env file not found" -ForegroundColor Yellow
     Write-Host ""
     Write-Host "Creating .env file from .env.example..." -ForegroundColor Yellow
 
     if (Test-Path ".env.example") {
         Copy-Item ".env.example" ".env"
-        Write-Host "✓ .env file created" -ForegroundColor Green
+        Write-Host "[OK] .env file created" -ForegroundColor Green
         Write-Host ""
         Write-Host "IMPORTANT: Please edit .env with your RightFax configuration:" -ForegroundColor Yellow
         Write-Host "  1. Open: notepad .env" -ForegroundColor White
@@ -73,13 +73,13 @@ if (-not (Test-Path ".env")) {
             exit 1
         }
     } else {
-        Write-Host "✗ Error: .env.example not found" -ForegroundColor Red
+        Write-Host "[ERROR] .env.example not found" -ForegroundColor Red
         Write-Host ""
         Read-Host "Press Enter to exit"
         exit 1
     }
 } else {
-    Write-Host "✓ .env file found" -ForegroundColor Green
+    Write-Host "[OK] .env file found" -ForegroundColor Green
 }
 
 # Create necessary directories
@@ -88,7 +88,7 @@ $directories = @("volumes\fcl", "volumes\xml", "logs", "uploads", "xml_archive")
 foreach ($dir in $directories) {
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
-        Write-Host "✓ Created directory: $dir" -ForegroundColor Green
+        Write-Host "[OK] Created directory: $dir" -ForegroundColor Green
     }
 }
 
@@ -104,7 +104,7 @@ docker compose up -d
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
-    Write-Host "✗ Error: Failed to start Docker services" -ForegroundColor Red
+    Write-Host "[ERROR] Failed to start Docker services" -ForegroundColor Red
     Write-Host ""
     Write-Host "Troubleshooting tips:" -ForegroundColor Yellow
     Write-Host "  1. Check that ports 80, 3000, 5000, 5432, 6379 are not in use" -ForegroundColor White
