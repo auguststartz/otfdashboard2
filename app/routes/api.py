@@ -13,6 +13,12 @@ from datetime import datetime, timedelta
 bp = Blueprint('api', __name__, url_prefix='/api')
 
 
+def get_celery():
+    """Get Celery instance - import here to avoid circular imports"""
+    from app.tasks.submission_tasks import submit_batch
+    return submit_batch
+
+
 @bp.route('/batches', methods=['GET'])
 def get_batches():
     """Get all submission batches with optional filtering"""
@@ -105,6 +111,16 @@ def create_batch():
 
         current_app.logger.info(f"Created batch {batch.id}: {batch.batch_name}")
 
+        # Trigger Celery task to start submitting faxes
+        try:
+            submit_batch_task = get_celery()
+            task = submit_batch_task.delay(batch.id)
+            current_app.logger.info(f"Triggered Celery task {task.id} for batch {batch.id}")
+        except Exception as e:
+            current_app.logger.error(f"Error triggering Celery task for batch {batch.id}: {e}")
+            # Don't fail the request - batch is created, just log the error
+            # User can manually trigger or retry
+
         return jsonify({
             'message': 'Batch created successfully',
             'batch': batch.to_dict()
@@ -113,6 +129,43 @@ def create_batch():
     except Exception as e:
         db.rollback()
         current_app.logger.error(f"Error creating batch: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        db.close()
+
+
+@bp.route('/batches/<int:batch_id>/trigger', methods=['POST'])
+def trigger_batch(batch_id):
+    """Manually trigger a batch submission (for pending or failed batches)"""
+    db = SessionLocal()
+    try:
+        batch = db.query(SubmissionBatch).filter(SubmissionBatch.id == batch_id).first()
+        if not batch:
+            return jsonify({'error': 'Batch not found'}), 404
+
+        if batch.status not in ['pending', 'failed', 'cancelled']:
+            return jsonify({'error': f'Cannot trigger batch with status: {batch.status}'}), 400
+
+        # Reset batch to pending
+        batch.status = 'pending'
+        batch.submitted_count = 0
+        db.commit()
+
+        # Trigger Celery task
+        submit_batch_task = get_celery()
+        task = submit_batch_task.delay(batch.id)
+
+        current_app.logger.info(f"Manually triggered Celery task {task.id} for batch {batch_id}")
+
+        return jsonify({
+            'message': 'Batch submission triggered',
+            'task_id': task.id,
+            'batch_id': batch_id
+        }), 200
+
+    except Exception as e:
+        db.rollback()
+        current_app.logger.error(f"Error triggering batch {batch_id}: {e}")
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()
@@ -233,6 +286,51 @@ def get_completions():
         return jsonify({'error': str(e)}), 500
     finally:
         db.close()
+
+
+@bp.route('/celery/status', methods=['GET'])
+def celery_status():
+    """Check Celery worker status"""
+    try:
+        from app.celery_app import celery
+
+        # Inspect active workers
+        inspect = celery.control.inspect()
+
+        # Get stats with timeout
+        stats = inspect.stats()
+        active = inspect.active()
+        registered = inspect.registered()
+
+        if not stats:
+            return jsonify({
+                'status': 'disconnected',
+                'message': 'No Celery workers are running',
+                'workers': []
+            }), 503
+
+        workers_info = []
+        for worker_name, worker_stats in stats.items():
+            workers_info.append({
+                'name': worker_name,
+                'status': 'online',
+                'pool': worker_stats.get('pool', {}).get('implementation', 'unknown'),
+                'active_tasks': len(active.get(worker_name, [])) if active else 0,
+                'registered_tasks': len(registered.get(worker_name, [])) if registered else 0
+            })
+
+        return jsonify({
+            'status': 'connected',
+            'workers': workers_info,
+            'worker_count': len(workers_info)
+        }), 200
+
+    except Exception as e:
+        current_app.logger.error(f"Error checking Celery status: {e}")
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 500
 
 
 @bp.route('/database/reset', methods=['POST'])
